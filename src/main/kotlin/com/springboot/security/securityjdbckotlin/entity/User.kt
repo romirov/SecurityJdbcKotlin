@@ -6,82 +6,57 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.util.stream.Collectors
 import javax.persistence.*
-import kotlin.collections.HashSet
+import javax.validation.constraints.Size
 
 @Suppress("JpaAttributeTypeInspection")
 @Table(name = "users")
 @Entity(name = "users")
-open class User: UserDetails {
+open class User(
+  @Column(nullable = false)
+  open val fistname:String,
+
+  @Column(nullable = false)
+  open val lastname: String,
+
+  @Column(name = "username", nullable = false)
+  @Size(min=2, message = "Не меньше 5 знаков")
+  open val userName: String,
+
+  @Column(nullable = false)
+  open val email: String,
+
+  @Column(name = "password", nullable = false)
+  @Size(min=2, message = "Не меньше 5 знаков")
+  open val passWord: String,
+
+  @Transient
+  open val passwordConfirm: String?,
+
+  @ManyToMany(fetch = FetchType.EAGER)
+  open val roles: Set<Role>
+): UserDetails {
   companion object: KLogging()
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private val id: Long? = null
+  open val id: Long? = 0L
 
-  @Column(nullable = false)
-  private var fistname:String = ""
-
-  @Column(nullable = false)
-  private var lastname: String = ""
-
-  @Column(nullable = false)
-  private var username: String = ""
-
-  @Column(nullable = false)
-  private var email: String = ""
-
-  @Column(nullable = false)
-  private var password: String = ""
-
-  @Transient
-  private val accountNonExpired: Boolean = true
-
-  @Transient
-  private val accountNonLocked: Boolean = true
-
-  @Transient
-  private val credentialsNonExpired: Boolean = true
-
-  @Transient
-  private val enabled: Boolean = true
-
-//  @ManyToMany
-//  @JoinTable(name = "users_roles")
-  @OneToMany(fetch = FetchType.EAGER, cascade = arrayOf(CascadeType.ALL))
-  @JoinColumn(name = "id",referencedColumnName="id")
-  private var roles: Set<Role> = HashSet<Role>()
-
-  override fun getAuthorities(): Collection<GrantedAuthority> {
-    return roles
-        .stream()
+  override fun getAuthorities(): Collection<GrantedAuthority> = roles.stream()
         .map { role ->
           logger.debug("Granting Authority to user with role: " + role.toString())
           SimpleGrantedAuthority(role.toString())
         }
         .collect(Collectors.toSet())
-  }
 
-  override fun getPassword(): String {
-    return password
-  }
+  override fun getPassword(): String = passWord
 
-  override fun getUsername(): String {
-    return username
-  }
+  override fun getUsername(): String = userName
 
-  override fun isAccountNonExpired(): Boolean {
-    return accountNonExpired
-  }
+  override fun isAccountNonExpired(): Boolean = true
 
-  override fun isAccountNonLocked(): Boolean {
-    return accountNonLocked
-  }
+  override fun isAccountNonLocked(): Boolean = true
 
-  override fun isCredentialsNonExpired(): Boolean {
-    return credentialsNonExpired
-  }
+  override fun isCredentialsNonExpired(): Boolean = true
 
-  override fun isEnabled(): Boolean {
-    return enabled
-  }
+  override fun isEnabled(): Boolean = true
 }

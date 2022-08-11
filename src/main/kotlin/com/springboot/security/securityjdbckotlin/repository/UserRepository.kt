@@ -4,5 +4,5 @@ import com.springboot.security.securityjdbckotlin.entity.User
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface UserRepository: JpaRepository<User, Long> {
-  fun findOneByUsername(username: String): User?
+  fun findByUserName(username: String): User?
 }

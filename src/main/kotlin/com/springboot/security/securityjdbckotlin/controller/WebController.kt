@@ -3,6 +3,7 @@ package com.springboot.security.securityjdbckotlin.controller
 import mu.KLogging
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
+import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.servlet.ModelAndView
 
@@ -10,26 +11,18 @@ import org.springframework.web.servlet.ModelAndView
 open class WebController {
 
   @GetMapping("/")
-  fun getMainPage(): String {
-    val modelAndView = ModelAndView("index")
+  fun getMainPage(model: Model, modelAndView: ModelAndView): String {
+    val modelAndView = ModelAndView()//("index")
     modelAndView.status = HttpStatus.OK
-    return "redirect:index"
-  }
-
-  @GetMapping("/index")
-  fun getIndexPage(): String {
-    val modelAndView = ModelAndView()
-    modelAndView.status = HttpStatus.OK
-    modelAndView.addObject("message","WORLD")
-    modelAndView.viewName = "index"
+    model.addAttribute("message","HELLO")
     return "index"
   }
 
-  @GetMapping("/login")
-  fun login(): String = "login"
-
-  @GetMapping("/logout")
-  fun logout(): String = "logout"
+//  @GetMapping("/login")
+//  fun login(): String = "login"
+//
+//  @GetMapping("/logout")
+//  fun logout(): String = "logout"
 
   @GetMapping("error")
   fun error(): ModelAndView {
